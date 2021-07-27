@@ -1,0 +1,198 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Site Selection {#site}
+
+## Objective {#site-objective}
+
+To use eBird Status Data Products to identify important sites for Loggerhead Shrike during the breeding season at different spatial scales. This is an example of an analysis you might do to prioritize sites for a species, perhaps for conservation or management.
+
+## Introduction {#site-intro}
+
+In the previous lesson, we saw how to download and load weekly estimates of relative abundance into R for further analysis. In this lesson, we'll demonstrate one possible use case for these data: identifying sites of high importance for a species of conservation concern. Let's start by loading the libraries we'll need for this analysis.
+
+```{r site-libraries}
+library(ebirdst)
+library(raster)
+library(sf)
+library(rnaturalearth)
+library(dplyr)
+library(ggplot2)
+```
+
+## Seasonal abundance data {#site-seasonal}
+
+For this site selection analysis we'll be interested in identifying important sites for Loggerhead Shrike during the **breeding** season. In the [previous lesson](#access) we worked with weekly estimates of relative abundance and we saw that we can access predefined seasonal boundary dates from the `ebirdst_runs` data frame.
+
+```{r seasonal-runs}
+logshr_run <- filter(ebirdst_runs, common_name == "Loggerhead Shrike")
+start_dt <- logshr_run$breeding_start
+end_dt <- logshr_run$breeding_end
+c(start_dt, end_dt)
+```
+
+We could subset the weekly relative abundance `RasterStack` to just the breeding season weeks, then average across the weeks. However, as a shortcut, the data package provides pre-calculated seasonal raster layers, which we can access with `load_raster()`.
+
+```{r seasonal-load}
+# find the location of the data we downloaded in the previous lesson
+sp_path <- get_species_path("Loggerhead Shrike")
+# load the seasonal rasters
+abd <- load_raster(sp_path, "abundance_seasonal")
+abd
+# subset to just the breeding season
+abd_breeding <- abd[["breeding"]]
+abd_breeding
+```
+
+This layer represents the expected relative abundance of Loggerhead Shrike during the breeding season on an eBird Traveling Count by a skilled eBirder starting at the optimal time of day with the optimal search duration and distance that maximizes detection of this species in a region.
+
+Let's crop and re-project based on the species specific map parameters.
+
+```{r seasonal-crop}
+# load mapping parameters
+map_pars <- load_fac_map_parameters(sp_path)
+
+# crop and reproject abundance raster
+abd_breeding_proj <- abd_breeding %>% 
+  crop(map_pars$fa_extent_sinu) %>% 
+  projectRaster(crs = map_pars$custom_projection, method = "ngb")
+```
+
+## Range-wide site selection {#site-rangewide}
+
+To perform a range-wide site selection, we'll identify the locations with the top 5% of non-zero abundance values across the entire range and visualize those locations. 
+
+```{r rangewide-quantile}
+# remove zeroes prior to calculating quantiles
+abd_breeding_proj[abd_breeding_proj == 0] <- NA
+# calculate the 95th quantile
+q95 <- quantile(abd_breeding_proj, na.rm = TRUE, probs = 0.95)
+# identify top 5% of cells
+abd_top5 <- trim(abd_breeding_proj >= q95)
+```
+
+Finally let's map these selected sites.
+
+```{r rangewide-map}
+par(mar = c(0, 0, 0, 0))
+plot(abd_top5, col = c('#d9d9d9', '#fd8d3c'), 
+     axes = FALSE, box = FALSE,
+     maxpixels = ncell(abd_top5))
+```
+
+## Local Selection {#site-local}
+
+Let's transition from broad-scale, region-wide site selection to a local site selection exercise. For example, let's consider a land trust working in Louisiana trying to identify important sites for Loggerhead Shrike. To start, we'll get a boundary polygon for Louisiana.
+
+```{r local-la}
+# get spatial boundary for louisiana
+la <- ne_states(iso_a2 = "US", returnclass = "sf") %>% 
+  filter(name == "Louisiana") %>% 
+  # project
+  st_transform(crs = map_pars$custom_projection)
+```
+
+We can identify the quartiles of the abundance data within Louisiana, essentially dividing the cells within the state into four equally sized groups.
+
+```{r local-quarters}
+# mask to louisiana
+abd_breeding_la <- mask(abd_breeding_proj, la) %>% 
+  raster::trim()
+
+# calculate abundance quartiles
+quarters <- quantile(abd_breeding_la, probs = c(0.25, 0.5, 0.75, 1)) %>% 
+  round(4)
+
+# map
+par(mar = c(1, 1, 1, 1))
+plot(st_geometry(la))
+plot(abd_breeding_la, 
+     breaks = c(0, quarters), col = abundance_palette(4, season = "weekly"),
+     maxpixels = ncell(abd_breeding_la),
+     box = FALSE, axes = FALSE, add = TRUE)
+plot(st_geometry(la), add = TRUE)
+```
+
+### Uncertainty analysis {#site-local-uncertainty}
+
+When using these abundance rasters at a local scale, it's important to be cautious because of the broad spatial scale at which the modeling was conducted. As with any modeled estimates, these abundance estimates have uncertainty associated with them. One approach to dealing with this is to use the spatial estimates of uncertainty (the 10th and 90th quantiles of relative abundance) to assess if locations that we're considering for selection have overlapping confidence intervals.
+
+Let's start by loading these upper and lower confidence interval raster layers, subsetting to the breeding season within Louisiana, and calculating a breeding season average. 
+
+```{r local-uncertainty-load}
+# load the upper and lower confidence intervals
+abd_upper <- load_raster(sp_path, "abundance_upper")
+abd_lower <- load_raster(sp_path, "abundance_lower")
+
+# subset to breeding season in louisiana
+la_breeding_season <- ebirdst_extent(la, c(start_dt, end_dt))
+abd_upper_br <- ebirdst_subset(abd_upper, la_breeding_season)
+abd_lower_br <- ebirdst_subset(abd_lower, la_breeding_season)
+
+# average for the breeding season and project
+abd_upper_br_avg <- calc(abd_upper_br, fun = mean, na.rm = TRUE) %>% 
+  projectRaster(crs = map_pars$custom_projection,
+                method = "ngb")
+abd_lower_br_avg <- calc(abd_lower_br, fun = mean, na.rm = TRUE) %>% 
+  projectRaster(crs = map_pars$custom_projection,
+                method = "ngb")
+```
+
+Next, let's imagine we're considering three potential sites in northern Louisiana, one in each of the top three quartiles of abundance.
+
+```{r local-uncertainty-pts}
+# generate points and convert to spatial
+pts <- data.frame(name = c("High", "Middle", "Low"),
+                  lng = c(-91.173, -91.137, -91.169),
+                  lat = c(32.322, 32.271, 32.295)) %>% 
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) %>% 
+  st_transform(crs = st_crs(map_pars$custom_projection))
+pts$name <- factor(pts$name, levels = c("High", "Middle", "Low"))
+```
+
+We can overlay these points on a zoomed-in version of the above quartile map. Note that they each falls within a different colored cell, i.e. they all belong to different quartiles.
+
+```{r local-uncertainty-map}
+plot(abd_breeding_la, 
+     breaks = c(0, quarters), 
+     col = abundance_palette(4, season = "weekly"), alpha = 0.75,
+     ext = st_buffer(pts, 10000), 
+     maxpixels = ncell(abd_breeding_la),
+     box = FALSE, axes = FALSE)
+plot(pts, pch = 21, bg = "red", col = "black", cex = 1, add = TRUE)
+```
+
+Let's look at the abundance and confidence intervals for each of these points.
+
+```{r local-uncertainty-plot}
+# extract raster values
+pts$abd <- extract(abd_breeding_la, pts)
+pts$lower <- extract(abd_lower_br_avg, pts)
+pts$upper <- extract(abd_upper_br_avg, pts)
+
+# plot the confidence intervals for the three points
+ggplot(pts, aes(y = abd, x = name)) +
+  geom_point() + 
+  geom_errorbar(aes(ymin = lower, ymax = upper)) +
+  labs(x = "Location", y = "Relative Abundance",
+       title = "Confidence intervals for locations")
+```
+
+So, despite the "High" and "Middle" sites belonging to different quartiles of relative abundance, the uncertainty analysis suggests that we don't have good evidence to pick one site over the other. In contrast, the "Low" site is signficantly lower in relative abundance than the other two sites.
+
+### Ground truth {#site-local-ground}
+
+One additional way to check the results of a site selection exercise is to ground truth the results using satellite imagery for the region in question.
+
+```{r local-uncertainty-ground, echo = FALSE, eval = FALSE}
+cells <- mask(abd_breeding_la, pts) %>% 
+  rasterToPolygons() %>% 
+  st_as_sf()
+write_sf(cells, "~/Desktop/ground-truth.gpkg", layer = "cells")
+write_sf(pts, "~/Desktop/ground-truth.gpkg", layer = "sites")
+```
+
+`r knitr::include_graphics("img/logshr-satellite.png")`

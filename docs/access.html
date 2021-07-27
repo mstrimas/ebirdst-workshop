@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Lesson 1 Data Access | eBird Status Data Products Workshop</title>
+  <meta name="description" content="Lessons for a workshop on accessing and using the eBird Status Data Products" />
+  <meta name="generator" content="bookdown 0.22.15 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Lesson 1 Data Access | eBird Status Data Products Workshop" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Lessons for a workshop on accessing and using the eBird Status Data Products" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Lesson 1 Data Access | eBird Status Data Products Workshop" />
+  
+  <meta name="twitter:description" content="Lessons for a workshop on accessing and using the eBird Status Data Products" />
+  
+
+<meta name="author" content="Matthew Strimas-Mackey and Tom Auer" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="site.html"/>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">eBird Status and Trends</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome</a>
+<ul>
+<li class="chapter" data-level="0.1" data-path="index.html"><a href="index.html#setup"><i class="fa fa-check"></i><b>0.1</b> Setup</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="access.html"><a href="access.html"><i class="fa fa-check"></i><b>1</b> Data Access</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="access.html"><a href="access.html#access-objective"><i class="fa fa-check"></i><b>1.1</b> Objective</a></li>
+<li class="chapter" data-level="1.2" data-path="access.html"><a href="access.html#access-intro"><i class="fa fa-check"></i><b>1.2</b> Introduction</a></li>
+<li class="chapter" data-level="1.3" data-path="access.html"><a href="access.html#access-request"><i class="fa fa-check"></i><b>1.3</b> Request access</a></li>
+<li class="chapter" data-level="1.4" data-path="access.html"><a href="access.html#access-species"><i class="fa fa-check"></i><b>1.4</b> Species list</a></li>
+<li class="chapter" data-level="1.5" data-path="access.html"><a href="access.html#access-dl"><i class="fa fa-check"></i><b>1.5</b> Download data</a></li>
+<li class="chapter" data-level="1.6" data-path="access.html"><a href="access.html#access-load"><i class="fa fa-check"></i><b>1.6</b> Load data</a></li>
+<li class="chapter" data-level="1.7" data-path="access.html"><a href="access.html#access-map"><i class="fa fa-check"></i><b>1.7</b> Mapping</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="site.html"><a href="site.html"><i class="fa fa-check"></i><b>2</b> Site Selection</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="site.html"><a href="site.html#site-objective"><i class="fa fa-check"></i><b>2.1</b> Objective</a></li>
+<li class="chapter" data-level="2.2" data-path="site.html"><a href="site.html#site-intro"><i class="fa fa-check"></i><b>2.2</b> Introduction</a></li>
+<li class="chapter" data-level="2.3" data-path="site.html"><a href="site.html#site-seasonal"><i class="fa fa-check"></i><b>2.3</b> Seasonal abundance data</a></li>
+<li class="chapter" data-level="2.4" data-path="site.html"><a href="site.html#site-rangewide"><i class="fa fa-check"></i><b>2.4</b> Range-wide site selection</a></li>
+<li class="chapter" data-level="2.5" data-path="site.html"><a href="site.html#site-local"><i class="fa fa-check"></i><b>2.5</b> Local Selection</a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="site.html"><a href="site.html#site-local-uncertainty"><i class="fa fa-check"></i><b>2.5.1</b> Uncertainty analysis</a></li>
+<li class="chapter" data-level="2.5.2" data-path="site.html"><a href="site.html#site-local-ground"><i class="fa fa-check"></i><b>2.5.2</b> Ground truth</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="trajectories.html"><a href="trajectories.html"><i class="fa fa-check"></i><b>3</b> Multi-species Trajectories</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="trajectories.html"><a href="trajectories.html#trajectories-objective"><i class="fa fa-check"></i><b>3.1</b> Objective</a></li>
+<li class="chapter" data-level="3.2" data-path="trajectories.html"><a href="trajectories.html#trajectories-intro"><i class="fa fa-check"></i><b>3.2</b> Introduction</a></li>
+<li class="chapter" data-level="3.3" data-path="trajectories.html"><a href="trajectories.html#trajectories-data"><i class="fa fa-check"></i><b>3.3</b> Multi-species data</a></li>
+<li class="chapter" data-level="3.4" data-path="trajectories.html"><a href="trajectories.html#trajectories-pop"><i class="fa fa-check"></i><b>3.4</b> Proportion of population</a></li>
+<li class="chapter" data-level="3.5" data-path="trajectories.html"><a href="trajectories.html#trajectories-traj"><i class="fa fa-check"></i><b>3.5</b> Trajectories</a></li>
+<li class="chapter" data-level="3.6" data-path="trajectories.html"><a href="trajectories.html#trajectories-rich"><i class="fa fa-check"></i><b>3.6</b> Richness</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="nonraster.html"><a href="nonraster.html"><i class="fa fa-check"></i><b>4</b> Non-raster Data</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="nonraster.html"><a href="nonraster.html#nonraster-objective"><i class="fa fa-check"></i><b>4.1</b> Objective</a></li>
+<li class="chapter" data-level="4.2" data-path="nonraster.html"><a href="nonraster.html#nonraster-intro"><i class="fa fa-check"></i><b>4.2</b> Introduction</a></li>
+<li class="chapter" data-level="4.3" data-path="nonraster.html"><a href="nonraster.html#nonraster-effext"><i class="fa fa-check"></i><b>4.3</b> Effective extent</a></li>
+<li class="chapter" data-level="4.4" data-path="nonraster.html"><a href="nonraster.html#nonraster-ppms"><i class="fa fa-check"></i><b>4.4</b> Predictive performance metrics</a></li>
+<li class="chapter" data-level="4.5" data-path="nonraster.html"><a href="nonraster.html#nonraster-pi"><i class="fa fa-check"></i><b>4.5</b> Predictor importance</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">eBird Status Data Products Workshop</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="access" class="section level1" number="1">
+<h1><span class="header-section-number">Lesson 1</span> Data Access</h1>
+<div id="access-objective" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Objective</h2>
+<p>To download eBird Status &amp; Trends data using the R package <a href="https://cornelllabofornithology.github.io/ebirdst/"><code>ebirdst</code></a>, load those data into R and make a simple map.</p>
+</div>
+<div id="access-intro" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Introduction</h2>
+<p><a href="https://ebird.org/science/status-and-trends">eBird Status and Trends</a> provides modeled estimates of the distributions, relative abundances, and environmental associations for more than 800 bird species over their full annual cycle at high spatial and temporal resolution. The data behind the visualizations and maps you’ve likely seen online are referred to as the <strong>eBird Status Data Products</strong>, and are available for download for most academic and research uses. The R package <a href="https://cornelllabofornithology.github.io/ebirdst/"><code>ebirdst</code></a> has been specifically designed to help download, manipulate, and analyze these data.</p>
+<p>Let’s start by loading the <code>ebirdst</code> R package and some additional packages for working with the data.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="access.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ebirdst)</span>
+<span id="cb3-2"><a href="access.html#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb3-3"><a href="access.html#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
+</div>
+<div id="access-request" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Request access</h2>
+<p>As of July 2021, access to the eBird Status Data Products is now granted through an Access Request Form at: <a href="https://ebird.org/st/request" class="uri">https://ebird.org/st/request</a>. Access with this form generates a key to be used with the <code>ebirdst</code> R package and is provided immediately (as long as commercial use is not requested). Our terms of use have been updated to be more permissive in many cases, particularly academic and research use. When requesting data access, please be sure to carefully read the terms of use and ensure that your intended use is not restricted.</p>
+<p>After reading the <a href="https://ebird.org/science/status-and-trends/st-data-access-terms-of-use/">eBird Status and Trends Products Terms of Use</a> and filling out the <a href="https://ebird.org/st/request">Access Request Form</a> you will be provided with an alphanumeric access key. To store the access key so it can be accessed by R and the <code>ebirdst</code> package, run the following (replacing <code>"XXXXXXXXX"</code> with your actual key):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="access.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set_ebirdst_access_key</span>(<span class="st">&quot;XXXXXXXXX&quot;</span>)</span></code></pre></div>
+<p>Then immediately <strong>restart R</strong>. This will save the access key as the environment variable <code>EBIRDST_KEY</code> in your .Renviron file so it’s accessible within your R session.</p>
+</div>
+<div id="access-species" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> Species list</h2>
+<p>The <code>ebirdst_runs</code> object is a data frame listing all the available species.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="access.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(ebirdst_runs)</span>
+<span id="cb5-2"><a href="access.html#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Rows: 807</span></span>
+<span id="cb5-3"><a href="access.html#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Columns: 20</span></span>
+<span id="cb5-4"><a href="access.html#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ run_name                       [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;pabtin1-ERD2019-STATUS-20200828-baf1cd73&quot;, &quot;bbwduc-ERD2019-STATUS-202010…</span></span>
+<span id="cb5-5"><a href="access.html#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ species_code                   [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;pabtin1&quot;, &quot;bbwduc&quot;, &quot;wiwduc1&quot;, &quot;fuwduc&quot;, &quot;empgoo&quot;, &quot;snogoo&quot;, &quot;rosgoo&quot;, &quot;…</span></span>
+<span id="cb5-6"><a href="access.html#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ scientific_name                [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;Crypturellus transfasciatus&quot;, &quot;Dendrocygna autumnalis&quot;, &quot;Dendrocygna arb…</span></span>
+<span id="cb5-7"><a href="access.html#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ common_name                    [3m[38;5;246m&lt;chr&gt;[39m[23m &quot;Pale-browed Tinamou&quot;, &quot;Black-bellied Whistling-Duck&quot;, &quot;West Indian Whist…</span></span>
+<span id="cb5-8"><a href="access.html#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ resident                       [3m[38;5;246m&lt;lgl&gt;[39m[23m TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE…</span></span>
+<span id="cb5-9"><a href="access.html#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ breeding_quality               [3m[38;5;246m&lt;dbl&gt;[39m[23m 2, 3, 2, 3, 2, 3, 2, 2, 2, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 0, 3, 3…</span></span>
+<span id="cb5-10"><a href="access.html#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ breeding_start                 [3m[38;5;246m&lt;date&gt;[39m[23m NA, 2019-05-24, NA, 2019-05-10, 2019-05-24, 2019-06-07, 2019-06-07, 2019…</span></span>
+<span id="cb5-11"><a href="access.html#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ breeding_end                   [3m[38;5;246m&lt;date&gt;[39m[23m NA, 2019-08-03, NA, 2019-08-17, 2019-06-21, 2019-08-03, 2019-06-28, 2019…</span></span>
+<span id="cb5-12"><a href="access.html#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ nonbreeding_quality            [3m[38;5;246m&lt;dbl&gt;[39m[23m 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3…</span></span>
+<span id="cb5-13"><a href="access.html#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ nonbreeding_start              [3m[38;5;246m&lt;date&gt;[39m[23m NA, 2019-01-18, NA, 2019-11-30, 2019-10-26, 2019-12-28, 2019-12-21, 2019…</span></span>
+<span id="cb5-14"><a href="access.html#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ nonbreeding_end                [3m[38;5;246m&lt;date&gt;[39m[23m NA, 2019-03-01, NA, 2019-02-15, 2019-04-05, 2019-01-11, 2019-01-11, 2019…</span></span>
+<span id="cb5-15"><a href="access.html#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ postbreeding_migration_quality [3m[38;5;246m&lt;dbl&gt;[39m[23m 2, 3, 2, 3, 2, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3…</span></span>
+<span id="cb5-16"><a href="access.html#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ postbreeding_migration_start   [3m[38;5;246m&lt;date&gt;[39m[23m NA, 2019-08-10, NA, 2019-08-24, 2019-06-28, 2019-08-17, 2019-08-24, 2019…</span></span>
+<span id="cb5-17"><a href="access.html#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ postbreeding_migration_end     [3m[38;5;246m&lt;date&gt;[39m[23m NA, 2019-01-11, NA, 2019-11-23, 2019-10-19, 2019-12-21, 2019-12-07, 2019…</span></span>
+<span id="cb5-18"><a href="access.html#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ prebreeding_migration_quality  [3m[38;5;246m&lt;dbl&gt;[39m[23m 2, 3, 2, 3, 2, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3…</span></span>
+<span id="cb5-19"><a href="access.html#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ prebreeding_migration_start    [3m[38;5;246m&lt;date&gt;[39m[23m NA, 2019-03-08, NA, 2019-02-22, 2019-04-12, 2019-01-18, 2019-01-18, 2019…</span></span>
+<span id="cb5-20"><a href="access.html#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ prebreeding_migration_end      [3m[38;5;246m&lt;date&gt;[39m[23m NA, 2019-05-17, NA, 2019-05-03, 2019-05-17, 2019-05-31, 2019-05-31, 2019…</span></span>
+<span id="cb5-21"><a href="access.html#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ resident_quality               [3m[38;5;246m&lt;dbl&gt;[39m[23m 2, 2, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3…</span></span>
+<span id="cb5-22"><a href="access.html#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ resident_start                 [3m[38;5;246m&lt;date&gt;[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 2019-02-15, NA, …</span></span>
+<span id="cb5-23"><a href="access.html#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ resident_end                   [3m[38;5;246m&lt;date&gt;[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 2019-04-12, NA, …</span></span></code></pre></div>
+<p>If you’re working in RStudio, you can use <code>View()</code> to interactively explore this data frame. You can also consult the <a href="https://ebird.org/science/status-and-trends">Status and Trends</a> landing page to see the full list of species.</p>
+<p>All species go through a process of expert human review prior to being released. The <code>ebirdst_runs</code> data frame also contains information from this review process. Reviewers assess each of the four seasons: breeding, non-breeding, pre-breeding migration, and post-breeding migration. Resident (i.e., non-migratory) species are identified by having <code>TRUE</code> in the <code>resident</code> column of <code>ebirdst_runs</code>, and these species are assessed across the whole year rather than seasonally. <code>ebirdst_runs</code> contains two important pieces of information for each season: a <strong>quality</strong> rating and <strong>seasonal dates</strong>.</p>
+<p>The <strong>seasonal dates</strong> define the weeks that fall within each season; these relative abundance estimates for these weeks get averaged to produce the seasonal relative abundance maps on the Status and Trends website. Breeding and non-breeding season dates are defined for each species as the weeks during those seasons when the species’ population does not move. For this reason, these seasons are also described as stationary periods. Migration periods are defined as the periods of movement between the stationary non-breeding and breeding seasons. Note that for many species these migratory periods include not only movement from breeding grounds to non-breeding grounds, but also post-breeding dispersal, molt migration, and other movements.</p>
+<p>Reviewers also examine the model estimates for each season to assess the amount of extrapolation or omission present in the model, and assign an associated quality rating ranging from 0 (lowest quality) to 3 (highest quality). Extrapolation refers to cases where the model predicts occurrence where the species is known to be absent, while omission refers to the model failing to predict occurrence where a species is known to be present.</p>
+<p>A rating of 0 implies this season failed review and model results should not be used at all for this period. Ratings of 1-3 correspond to a gradient of more to less extrapolation and/or omission, and we often use a traffic light analogy when referring to them:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Red light</strong>: low quality, extensive extrapolation and/or omission and noise, but at least some regions have estimates that are accurate; can be used with caution in certain regions.</li>
+<li><strong>Yellow light</strong>: medium quality, some extrapolation and/or omission; use with caution.</li>
+<li><strong>Green light</strong>: high quality, very little or no extrapolation and/or omission; these seasons can be safely used.</li>
+</ol>
+</div>
+<div id="access-dl" class="section level2" number="1.5">
+<h2><span class="header-section-number">1.5</span> Download data</h2>
+<p>The function <code>ebirdst_download()</code> downloads data for a single species from AWS. All you need to do is provide the name (common name, scientific name, or species code) of the species you want to download. For this example, I’ll download the data for Loggerhead Shrike.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="access.html#cb6-1" aria-hidden="true" tabindex="-1"></a>sp_path <span class="ot">&lt;-</span> <span class="fu">ebirdst_download</span>(<span class="at">species =</span> <span class="st">&quot;Loggerhead Shrike&quot;</span>)</span>
+<span id="cb6-2"><a href="access.html#cb6-2" aria-hidden="true" tabindex="-1"></a>sp_path</span></code></pre></div>
+<pre><code>#&gt; [1] &quot;/Users/mes335/Library/Application Support/ebirdst/logshr-ERD2019-STATUS-20201005-c29ce152&quot;</code></pre>
+<p>The function will automatically identify a suitable location to store the downloaded data and return that path, which we captured in the variable <code>sp_path</code>. By default, <code>ebirdst_download()</code> downloads just the raster predictions from Status Data Products for relative occurrence, count, and abundance. We can see the files downloaded with:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="access.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(sp_path, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-2"><a href="access.html#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_abundance-seasonal_breeding.tif&quot;              </span></span>
+<span id="cb8-3"><a href="access.html#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [2] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_abundance-seasonal_nonbreeding.tif&quot;           </span></span>
+<span id="cb8-4"><a href="access.html#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [3] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_abundance-seasonal_postbreeding_migration.tif&quot;</span></span>
+<span id="cb8-5"><a href="access.html#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [4] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_abundance-seasonal_prebreeding_migration.tif&quot; </span></span>
+<span id="cb8-6"><a href="access.html#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [5] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_lr_2019_abundance-seasonal_breeding.tif&quot;              </span></span>
+<span id="cb8-7"><a href="access.html#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [6] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_lr_2019_abundance-seasonal_nonbreeding.tif&quot;           </span></span>
+<span id="cb8-8"><a href="access.html#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_lr_2019_abundance-seasonal_postbreeding_migration.tif&quot;</span></span>
+<span id="cb8-9"><a href="access.html#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [8] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_lr_2019_abundance-seasonal_prebreeding_migration.tif&quot; </span></span>
+<span id="cb8-10"><a href="access.html#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [9] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_mr_2019_abundance-seasonal_breeding.tif&quot;              </span></span>
+<span id="cb8-11"><a href="access.html#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [10] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_mr_2019_abundance-seasonal_nonbreeding.tif&quot;           </span></span>
+<span id="cb8-12"><a href="access.html#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [11] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_mr_2019_abundance-seasonal_postbreeding_migration.tif&quot;</span></span>
+<span id="cb8-13"><a href="access.html#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [12] &quot;abundance_seasonal/logshr-ERD2019-STATUS-20201005-c29ce152_mr_2019_abundance-seasonal_prebreeding_migration.tif&quot; </span></span>
+<span id="cb8-14"><a href="access.html#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [13] &quot;config.rds&quot;                                                                                                      </span></span>
+<span id="cb8-15"><a href="access.html#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [14] &quot;pi-pd.db&quot;                                                                                                        </span></span>
+<span id="cb8-16"><a href="access.html#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [15] &quot;predictions.db&quot;                                                                                                  </span></span>
+<span id="cb8-17"><a href="access.html#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [16] &quot;srd_raster_template.tif&quot;                                                                                         </span></span>
+<span id="cb8-18"><a href="access.html#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [17] &quot;weekly_cubes/band_dates.csv&quot;                                                                                     </span></span>
+<span id="cb8-19"><a href="access.html#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [18] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_abundance_lower.tif&quot;                                </span></span>
+<span id="cb8-20"><a href="access.html#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [19] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_abundance_median.tif&quot;                               </span></span>
+<span id="cb8-21"><a href="access.html#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [20] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_abundance_upper.tif&quot;                                </span></span>
+<span id="cb8-22"><a href="access.html#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [21] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_count_median.tif&quot;                                   </span></span>
+<span id="cb8-23"><a href="access.html#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [22] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_occurrence_median.tif&quot;                              </span></span>
+<span id="cb8-24"><a href="access.html#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [23] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_lr_2019_abundance_lower.tif&quot;                                </span></span>
+<span id="cb8-25"><a href="access.html#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [24] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_lr_2019_abundance_median.tif&quot;                               </span></span>
+<span id="cb8-26"><a href="access.html#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [25] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_lr_2019_abundance_upper.tif&quot;                                </span></span>
+<span id="cb8-27"><a href="access.html#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [26] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_lr_2019_count_median.tif&quot;                                   </span></span>
+<span id="cb8-28"><a href="access.html#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [27] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_lr_2019_occurrence_median.tif&quot;                              </span></span>
+<span id="cb8-29"><a href="access.html#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [28] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_mr_2019_abundance_lower.tif&quot;                                </span></span>
+<span id="cb8-30"><a href="access.html#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [29] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_mr_2019_abundance_median.tif&quot;                               </span></span>
+<span id="cb8-31"><a href="access.html#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [30] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_mr_2019_abundance_upper.tif&quot;                                </span></span>
+<span id="cb8-32"><a href="access.html#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [31] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_mr_2019_count_median.tif&quot;                                   </span></span>
+<span id="cb8-33"><a href="access.html#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [32] &quot;weekly_cubes/logshr-ERD2019-STATUS-20201005-c29ce152_mr_2019_occurrence_median.tif&quot;</span></span></code></pre></div>
+<p>In addition to the raster data, the data packages contain two SQLite databases storing information about model performance and environmental associations. These files are quite large, and are not likely to be required by many users, so are not downloaded by default. Use <code>tifs_only = FALSE</code> to download this additional data:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="access.html#cb9-1" aria-hidden="true" tabindex="-1"></a>sp_path <span class="ot">&lt;-</span> <span class="fu">ebirdst_download</span>(<span class="at">species =</span> <span class="st">&quot;logshr&quot;</span>, <span class="at">tifs_only =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<p>In the <a href="nonraster.html#nonraster">last lesson</a> of this workshop we’ll touch on these non-raster Data Products.</p>
+</div>
+<div id="access-load" class="section level2" number="1.6">
+<h2><span class="header-section-number">1.6</span> Load data</h2>
+<p>Now that we’ve downloaded the data package, let’s load some data into our R session. These are raster data (i.e. estimates are provided over a regular grid) and therefore we’ll need the <code>raster</code> package (loaded above) to work with them. There are a variety of layers available, but let’s load the relative abundance estimates. To learn about some of the other layers, consult the <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst.html#raster-data-1">associated vignette</a> from the <code>ebirdst</code> package.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="access.html#cb10-1" aria-hidden="true" tabindex="-1"></a>abd <span class="ot">&lt;-</span> <span class="fu">load_raster</span>(<span class="at">path =</span> sp_path, <span class="at">product =</span> <span class="st">&quot;abundance&quot;</span>)</span>
+<span id="cb10-2"><a href="access.html#cb10-2" aria-hidden="true" tabindex="-1"></a>abd</span>
+<span id="cb10-3"><a href="access.html#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class      : RasterStack </span></span>
+<span id="cb10-4"><a href="access.html#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dimensions : 5630, 6957, 39167910, 52  (nrow, ncol, ncell, nlayers)</span></span>
+<span id="cb10-5"><a href="access.html#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; resolution : 2963, 2963  (x, y)</span></span>
+<span id="cb10-6"><a href="access.html#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; extent     : -2e+07, 597137, -6673060, 1e+07  (xmin, xmax, ymin, ymax)</span></span>
+<span id="cb10-7"><a href="access.html#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; crs        : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs </span></span>
+<span id="cb10-8"><a href="access.html#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; names      : w2019.01.04, w2019.01.11, w2019.01.18, w2019.01.25, w2019.02.01, w2019.02.08, w2019.02.15, w2019.02.22, w2019.03.01, w2019.03.08, w2019.03.15, w2019.03.22, w2019.03.29, w2019.04.05, w2019.04.12, ... </span></span>
+<span id="cb10-9"><a href="access.html#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; min values :           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0,           0, ... </span></span>
+<span id="cb10-10"><a href="access.html#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; max values :        2.94,        3.07,        3.26,        3.36,        3.36,        3.46,        3.64,        3.53,        3.27,        3.25,        3.21,        3.68,        3.34,        2.24,        2.14, ...</span></span></code></pre></div>
+<p>This is a <code>RasterStack</code> object with 52 layers, each providing a relative abundance estimate for a single week of the year. We typically refer to these are cubes, e.g. the relative abundance cubes refers to the full 52 week stack of relative abundance estimates. To see the dates corresponding to the midpoint of these weeks, use:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="access.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">parse_raster_dates</span>(abd)</span>
+<span id="cb11-2"><a href="access.html#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;2019-01-04&quot; &quot;2019-01-11&quot; &quot;2019-01-18&quot; &quot;2019-01-25&quot; &quot;2019-02-01&quot; &quot;2019-02-08&quot; &quot;2019-02-15&quot; &quot;2019-02-22&quot;</span></span>
+<span id="cb11-3"><a href="access.html#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [9] &quot;2019-03-01&quot; &quot;2019-03-08&quot; &quot;2019-03-15&quot; &quot;2019-03-22&quot; &quot;2019-03-29&quot; &quot;2019-04-05&quot; &quot;2019-04-12&quot; &quot;2019-04-19&quot;</span></span>
+<span id="cb11-4"><a href="access.html#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [17] &quot;2019-04-26&quot; &quot;2019-05-03&quot; &quot;2019-05-10&quot; &quot;2019-05-17&quot; &quot;2019-05-24&quot; &quot;2019-05-31&quot; &quot;2019-06-07&quot; &quot;2019-06-14&quot;</span></span>
+<span id="cb11-5"><a href="access.html#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [25] &quot;2019-06-21&quot; &quot;2019-06-28&quot; &quot;2019-07-06&quot; &quot;2019-07-13&quot; &quot;2019-07-20&quot; &quot;2019-07-27&quot; &quot;2019-08-03&quot; &quot;2019-08-10&quot;</span></span>
+<span id="cb11-6"><a href="access.html#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [33] &quot;2019-08-17&quot; &quot;2019-08-24&quot; &quot;2019-08-31&quot; &quot;2019-09-07&quot; &quot;2019-09-14&quot; &quot;2019-09-21&quot; &quot;2019-09-28&quot; &quot;2019-10-05&quot;</span></span>
+<span id="cb11-7"><a href="access.html#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [41] &quot;2019-10-12&quot; &quot;2019-10-19&quot; &quot;2019-10-26&quot; &quot;2019-11-02&quot; &quot;2019-11-09&quot; &quot;2019-11-16&quot; &quot;2019-11-23&quot; &quot;2019-11-30&quot;</span></span>
+<span id="cb11-8"><a href="access.html#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [49] &quot;2019-12-07&quot; &quot;2019-12-14&quot; &quot;2019-12-21&quot; &quot;2019-12-28&quot;</span></span></code></pre></div>
+<p>For a given week, these data consist of estimates of relative abundance over a regular 2.96 km grid. For example, we can extract just the 20th week (centered on May 17, 2018) with:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="access.html#cb12-1" aria-hidden="true" tabindex="-1"></a>abd[[<span class="dv">20</span>]]</span>
+<span id="cb12-2"><a href="access.html#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; class      : RasterLayer </span></span>
+<span id="cb12-3"><a href="access.html#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; band       : 20  (of  52  bands)</span></span>
+<span id="cb12-4"><a href="access.html#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; dimensions : 5630, 6957, 39167910  (nrow, ncol, ncell)</span></span>
+<span id="cb12-5"><a href="access.html#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; resolution : 2963, 2963  (x, y)</span></span>
+<span id="cb12-6"><a href="access.html#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; extent     : -2e+07, 597137, -6673060, 1e+07  (xmin, xmax, ymin, ymax)</span></span>
+<span id="cb12-7"><a href="access.html#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; crs        : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs </span></span>
+<span id="cb12-8"><a href="access.html#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; source     : logshr-ERD2019-STATUS-20201005-c29ce152_hr_2019_abundance_median.tif </span></span>
+<span id="cb12-9"><a href="access.html#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; names      : w2019.05.17 </span></span>
+<span id="cb12-10"><a href="access.html#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; values     : 0, 2.13  (min, max)</span></span></code></pre></div>
+<p>It can be computationally challenging to work with the full data cubes, so we’ve provided data at three resolutions. Depenending on the situation, you may want to consider using one of the lower resolutions:</p>
+<ul>
+<li>High resolution (hr): the native 2.96 km resolution data</li>
+<li>Medium resolution (mr): the hr data aggregated by a factor of 3 in each direction resulting in a resolution of 8.89 km</li>
+<li>Low resolution (lr): the hr data aggregated by a factor of 9 in each direction resulting in a resolution of 26.7 km</li>
+</ul>
+<p>To access the lower resolution data, use the <code>resolution</code> argument to <code>load_raster()</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="access.html#cb13-1" aria-hidden="true" tabindex="-1"></a>abd_mr <span class="ot">&lt;-</span> <span class="fu">load_raster</span>(<span class="at">path =</span> sp_path, <span class="at">product =</span> <span class="st">&quot;abundance&quot;</span>, <span class="at">resolution =</span> <span class="st">&quot;mr&quot;</span>)</span>
+<span id="cb13-2"><a href="access.html#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">res</span>(abd)</span>
+<span id="cb13-3"><a href="access.html#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2963 2963</span></span>
+<span id="cb13-4"><a href="access.html#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">res</span>(abd_mr)</span>
+<span id="cb13-5"><a href="access.html#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 8888 8888</span></span></code></pre></div>
+</div>
+<div id="access-map" class="section level2" number="1.7">
+<h2><span class="header-section-number">1.7</span> Mapping</h2>
+<p>Let’s map a quick map of the May 17 abundance data to see what it looks like. The function <code>abundance_palette()</code> gives us access to the color palettes used in the online versions of the maps.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="access.html#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb14-2"><a href="access.html#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(abd[[<span class="dv">20</span>]], <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">box =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb14-3"><a href="access.html#cb14-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">abundance_palette</span>(<span class="dv">100</span>, <span class="at">season =</span> <span class="st">&quot;weekly&quot;</span>), </span>
+<span id="cb14-4"><a href="access.html#cb14-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">maxpixels =</span> <span class="fu">ncell</span>(abd))</span></code></pre></div>
+<p><img src="naoc2020-ebirdst_files/figure-html/map-simple-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p>Notice the extreme distortion in the continents, that most of this map is taken up by areas where the species doesn’t occur, and that there isn’t much resolution in the color palette in areas where it does occur. These raster layers are provided for the entire Western Hemisphere in a sinusoidal equal area projection. This format ensures consistency across the full set of Status and Trends species, but isn’t ideal for mapping the data for a single species. To address this, each Status and Trends data package comes with a set of parameters suitable for mapping the data for that species. Let’s reproduce the above map using the provided extent, projection, and legend bins.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="access.html#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load mapping parameters</span></span>
+<span id="cb15-2"><a href="access.html#cb15-2" aria-hidden="true" tabindex="-1"></a>map_pars <span class="ot">&lt;-</span> <span class="fu">load_fac_map_parameters</span>(sp_path)</span>
+<span id="cb15-3"><a href="access.html#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="access.html#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># crop and reproject abundance raster</span></span>
+<span id="cb15-5"><a href="access.html#cb15-5" aria-hidden="true" tabindex="-1"></a>abd_proj <span class="ot">&lt;-</span> abd[[<span class="dv">20</span>]] <span class="sc">%&gt;%</span> </span>
+<span id="cb15-6"><a href="access.html#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">crop</span>(map_pars<span class="sc">$</span>fa_extent_sinu) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-7"><a href="access.html#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">projectRaster</span>(<span class="at">crs =</span> map_pars<span class="sc">$</span>custom_projection, <span class="at">method =</span> <span class="st">&quot;ngb&quot;</span>)</span>
+<span id="cb15-8"><a href="access.html#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="access.html#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co"># map</span></span>
+<span id="cb15-10"><a href="access.html#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb15-11"><a href="access.html#cb15-11" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> <span class="fu">abundance_palette</span>(<span class="fu">length</span>(map_pars<span class="sc">$</span>abundance_bins), <span class="at">season =</span> <span class="st">&quot;weekly&quot;</span>)</span>
+<span id="cb15-12"><a href="access.html#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(abd_proj, </span>
+<span id="cb15-13"><a href="access.html#cb15-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, map_pars<span class="sc">$</span>abundance_bins), </span>
+<span id="cb15-14"><a href="access.html#cb15-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;#e6e6e6&quot;</span>, pal), </span>
+<span id="cb15-15"><a href="access.html#cb15-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">box =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb15-16"><a href="access.html#cb15-16" aria-hidden="true" tabindex="-1"></a>     <span class="at">maxpixels =</span> <span class="fu">ncell</span>(abd_proj))</span></code></pre></div>
+<p><img src="naoc2020-ebirdst_files/figure-html/map-pars-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p>Looking better, but still needs a lot of work! Consult the <a href="https://cornelllabofornithology.github.io/ebirdst/articles/ebirdst-intro-mapping.html">Introduction to Mapping vignette</a> for additional tips on producing high-quality maps using these data.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="site.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "lunr",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

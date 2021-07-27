@@ -1,0 +1,7 @@
+bookdown::gitbook:
+  css: style.css
+  config:
+    toc:
+      before: |
+        <li><a href="./">eBird Status and Trends</a></li>
+      after: null

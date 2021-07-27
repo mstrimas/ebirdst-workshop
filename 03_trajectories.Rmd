@@ -1,0 +1,136 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Multi-species Trajectories {#trajectories}
+
+## Objective {#trajectories-objective}
+
+To prepare data for comparing Status and Trends results across multiple species. As an example, we'll compute proportion of population trajectories for a suite of species.
+
+## Introduction {#trajectories-intro}
+
+Comparing Status Data Products between species requires extra caution because the models give _relative_ rather than absolute abundance. For example, species differ in their detectability, and this may cause differences in relative abundance. To address this, we'll convert relative abundance to a proportion of population metric for each species by dividing the abundance layer by the total abundance summed across the entire range. For any given cell, this gives the proportion of relative abundance occurring in that cell. In addition, in this lesson we'll look at the temporal dimension of these data, plotting trajectories through time for a given region.
+
+Let's start by loading the necessary packages for this lesson.
+
+```{r trajectories-libraries}
+library(ebirdst)
+library(raster)
+library(sf)
+library(rnaturalearth)
+library(tidyverse)
+library(parallel)
+extract <- raster::extract
+```
+
+For this example, we'll be looking at a suite of shorebird species in Kansas, so let's also get a boundary polygon for that state.
+
+```{r trajectories-boundary}
+ks <- ne_states(iso_a2 = "US", returnclass = "sf") %>% 
+  filter(name == "Kansas")
+```
+
+## Multi-species data {#trajectories-data}
+
+We begin by downloading data for a suite of 7 shorebird species that all spend at least a portion of the year within Kansas.
+
+```{r data-dl, eval = FALSE}
+species <- c("American Avocet", "Snowy Plover", "Hudsonian Godwit", 
+             "Willet", "Marbled Godwit", "Sanderling", 
+             "Semipalmated Sandpiper")
+sp_dirs <- map_chr(species, ebirdst_download) %>% 
+  setNames(species)
+```
+
+```{r data-dirs, echo = FALSE}
+species <- c("American Avocet", "Snowy Plover", "Hudsonian Godwit", 
+             "Willet", "Marbled Godwit", "Sanderling", 
+             "Semipalmated Sandpiper")
+sp_dirs <- map_chr(species, get_species_path) %>% 
+  setNames(species)
+```
+
+## Proportion of population {#trajectories-pop}
+
+Our goal is to produce trajectories comparing the proportion of each species' population within Kansas for each week of 2019. For each species we need to:
+
+1. Calculate the sum of the abundance within Kansas for each week
+2. Calculate the sum of the abundance across the entire range of the species for each week
+3. Calculate the proportion of the population as the ratio of the within Kansas abundance to the total abundance
+
+The below function performs these steps for a given species. Iterating over the full set of species at the highest resolution is quite computationally intensive, so to speed things up we're using the low resolution relative abundance estimates. Note that even at the lower resolution, this will still take a few minutes to run.
+
+```{r trajectories-pop-process, eval = FALSE}
+calculate_trajectory <- function(x, common_name, region) {
+  message(names(x))
+  # load and crop weekly abundance
+  abd <- load_raster(x, product = "abundance", resolution = "lr")
+  r <- st_transform(region, crs = st_crs(abd))
+  
+  # total abundance within region
+  abd_region <- abd %>% 
+    crop(r) %>% 
+    extract(r, fun = sum)
+  abd_region <- abd_region[1, , drop = TRUE]
+  
+  # calculate total range-wide abundance
+  if (.Platform$OS.type == "unix") {
+    abd_total <- mclapply(seq.int(nlayers(abd)),
+                          function(i) cellStats(abd[[i]], sum),
+                          mc.preschedule = TRUE, mc.set.seed = TRUE, 
+                          mc.cores = detectCores()) %>% 
+      unlist()
+  } else {
+    abd_total <- lapply(seq.int(nlayers(abd)),
+                        function(i) cellStats(abd[[i]], sum)) %>% 
+      unlist()
+  }
+  
+  
+  data.frame(common_name = common_name,
+             date = parse_raster_dates(abd),
+             prop_pop = abd_region / abd_total,
+             row.names = NULL)
+}
+trajectories <- map2_dfr(sp_dirs, names(sp_dirs), 
+                         calculate_trajectory,
+                         region = ks)
+write_csv(trajectories,  "data/shorebird_pop-trajectories.csv")
+```
+
+```{r trajectories-pop-load, echo = FALSE}
+trajectories <- read_csv("data/shorebird_pop-trajectories.csv",
+                         show_col_types = FALSE)
+```
+
+## Trajectories {#trajectories-traj}
+
+Now we can plot these trajectories for the set of shorebird species.
+
+```{r trajectories-traj}
+ggplot(trajectories, aes(date, prop_pop, color = common_name)) +
+  geom_line() +
+  labs(x = "Week", 
+       y = "Proportion of Population in Kansas",
+       color = NULL) +
+  theme(legend.position = "bottom")
+```
+
+## Richness {#trajectories-rich}
+
+Finally, we can combine these 7 trajectories into a single trajectory giving an estimate of the richness of this group of shorebirds throughout the year.
+
+```{r trajectories-rich}
+richness <- trajectories %>% 
+  group_by(date) %>%
+  summarise(n_species = n_distinct(common_name[prop_pop != 0]))
+
+# plot richness
+ggplot(richness, aes(date, n_species)) +
+  geom_line() +
+  labs(x = "Week", y = "Richness")
+```
+

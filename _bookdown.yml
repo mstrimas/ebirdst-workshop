@@ -1,0 +1,7 @@
+book_filename: "naoc2020-ebirdst"
+delete_merged_file: true
+output_dir: "docs"
+before_chapter_script: "_common.r"
+language:
+  ui:
+    chapter_name: "Lesson "

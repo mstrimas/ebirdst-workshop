@@ -1,0 +1,30 @@
+--- 
+title: "eBird Status Data Products Workshop"
+author: "Matthew Strimas-Mackey and Tom Auer"
+site: bookdown::bookdown_site
+documentclass: book
+description: "Lessons for a workshop on accessing and using the eBird Status Data Products"
+---
+
+# Welcome {-}
+
+The community science project [eBird](https://ebird.org/home) has generated a database of over 1 billion bird observations, with broad spatial and taxonomic coverage. Over the past 10 years, the [Cornell Lab of Ornithology](https://www.birds.cornell.edu/home/) has developed machine-learning models using eBird and remotely-sensed data to produce high resolution, weekly estimates of range boundaries, occurrence rate, and relative abundance while accounting for many of the biases inherent in community science datasets, including variation in observer behavior and effort. Visualizations and modeled Data Products over 800 bird species are currently available through the [eBird Status and Trends website](https://ebird.org/science/status-and-trends).
+
+This workshop will introduce attendees to the eBird Status Data Products (weekly estimates of range boundaries, occurrence rate, relative abundance, and habitat associations) and the `ebirdst` R package developed specifically for working with these data. This will include an introduction to the modeling process used to generate the eBird Status Data Products. It will also include a demonstration of how to access and manipulate these Data Products for specific combinations of species, seasons, and regions using the `ebirdst` package. After the workshop, attendees will have an understanding of how and when to use these Data Products for applied research and conservation efforts, including within-year dynamics. Some experience with R is required to follow along with the lessons in this workshop. Please note, this workshop will not cover the analysis of trends or trend data.
+
+## Setup
+
+To run the code in the workshop you'll need to install the following packages:
+
+```{r eval = FALSE}
+install.packages(c("tidyverse", "raster", "sf", "rnaturalearth", "rgeos", "remotes"))
+remotes::install_github("ropensci/rnaturalearthhires")
+```
+
+You'll also need to install the latest version of the `ebirdst` R package from GitHub:
+
+```{r eval = FALSE}
+remotes::install_github("CornellLabofOrnithology/ebirdst")
+```
+
+To download the source files and following along with this workshop visit the [GitHub repository](https://github.com/mstrimas/ebirdst-workshop/).

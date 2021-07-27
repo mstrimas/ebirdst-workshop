@@ -1,0 +1,77 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Non-raster Data {#nonraster}
+
+## Objective {#nonraster-objective}
+
+To use the non-raster, centroid data as a diagnostic tool to assess predictive performance and identify the most important habitat predictors.
+
+## Introduction {#nonraster-intro}
+
+If we use `ebirdst_download(tifs_only = FALSE)`, the Status and Trends data packages that get downloaded will contain some addition data beyond the raster data we've already been working with. These data are provided at the level of the individual stixels that make up the ensemble which produces the abundance estimates. We often refer to these as "centroid" data because the centroids of the stixels are used to identify which stixel the values come from.
+
+`r knitr::include_graphics("img/single_stixel_with_dots.png")`
+
+These data have a variety of uses, but we'll focus on three here:
+
+1.  Identifying the effective region from which information is going into the analysis
+2.  Using predictive performance metrics as a diagnostic tool to assess model performance in a given region
+3.  Identifying the most important habitat predictors in a given region
+
+We'll start by loading packages and defining a focal region and time period: Louisiana during the breeding season.
+
+```{r nonraster-intro}
+library(ebirdst)
+library(raster)
+library(sf)
+library(rnaturalearth)
+library(dplyr)
+library(ggplot2)
+
+# louisiana
+la <- ne_states(iso_a2 = "US", returnclass = "sf") %>% 
+  filter(name == "Louisiana")
+# breeding season
+logshr_run <- filter(ebirdst_runs, common_name == "Loggerhead Shrike")
+start_dt <- logshr_run$breeding_start
+end_dt <- logshr_run$breeding_end
+# ebirdst_extent object
+la_breeding_season <- ebirdst_extent(la, c(start_dt, end_dt))
+
+# loggerhead shrike data path
+sp_path <- get_species_path("logshr")
+```
+
+## Effective extent {#nonraster-effext}
+
+For a given region and time period, `stixel_footprint()` produces a raster showing the spatial footprint of all the stixels whose centroids of fall within the given region and hence contribute to the model estimates there. To visualize this footprint, use `plot().
+
+```{r nonraster-effext}
+footprint <- stixel_footprint(sp_path, la_breeding_season)
+plot(footprint)
+```
+
+## Predictive performance metrics {#nonraster-ppms}
+
+We can use `ebirdst_ppms()` to calculate model predictive performance metrics (PPMs) within a given region and season, here Louisiana during the breeding season, then call `plot()` to visualize these PPMs
+
+```{r nonraster-ppms}
+ppms <- ebirdst_ppms(sp_path, la_breeding_season)
+plot(ppms)
+```
+
+## Predictor importance {#nonraster-pi}
+
+Finally, we can look at the most importance predictor variables identified by the model in a given region and season.
+
+```{r nonraster-pi}
+# load predictor importance data
+pis <- load_pis(sp_path)
+
+# plot the predictor importances for louisiana in the breeding season
+plot_pis(pis, ext = la_breeding_season, by_cover_class = TRUE, n_top_pred = 25)
+```

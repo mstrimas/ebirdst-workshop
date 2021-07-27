@@ -1,0 +1,1 @@
+Repository for the eBird Status and Trends workshop. View the compiled book at: http://strimas.com/ebirdst-workshop/
