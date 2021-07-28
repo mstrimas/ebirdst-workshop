@@ -21,7 +21,7 @@
   <meta name="twitter:description" content="Lessons for a workshop on accessing and using the eBird Status Data Products" />
   
 
-<meta name="author" content="Matthew Strimas-Mackey and Tom Auer" />
+<meta name="author" content="Matt Strimas-Mackey and Tom Auer" />
 
 
 
@@ -178,6 +178,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.3" data-path="nonraster.html"><a href="nonraster.html#nonraster-effext"><i class="fa fa-check"></i><b>4.3</b> Effective extent</a></li>
 <li class="chapter" data-level="4.4" data-path="nonraster.html"><a href="nonraster.html#nonraster-ppms"><i class="fa fa-check"></i><b>4.4</b> Predictive performance metrics</a></li>
 <li class="chapter" data-level="4.5" data-path="nonraster.html"><a href="nonraster.html#nonraster-pi"><i class="fa fa-check"></i><b>4.5</b> Predictor importance</a></li>
+<li class="chapter" data-level="4.6" data-path="nonraster.html"><a href="nonraster.html#nonraster-pd"><i class="fa fa-check"></i><b>4.6</b> Partial dependance</a></li>
+<li class="chapter" data-level="4.7" data-path="nonraster.html"><a href="nonraster.html#nonraster-habitat"><i class="fa fa-check"></i><b>4.7</b> Habitat association</a></li>
 </ul></li>
 </ul>
 
@@ -266,7 +268,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb21-2"><a href="site.html#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(abd_top5, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&#39;#d9d9d9&#39;</span>, <span class="st">&#39;#fd8d3c&#39;</span>), </span>
 <span id="cb21-3"><a href="site.html#cb21-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">box =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb21-4"><a href="site.html#cb21-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">maxpixels =</span> <span class="fu">ncell</span>(abd_top5))</span></code></pre></div>
-<p><img src="naoc2020-ebirdst_files/figure-html/rangewide-map-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p><img src="ebirdst-workshop_files/figure-html/rangewide-map-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
 </div>
 <div id="site-local" class="section level2" number="2.5">
 <h2><span class="header-section-number">2.5</span> Local Selection</h2>
@@ -293,7 +295,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb23-14"><a href="site.html#cb23-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">maxpixels =</span> <span class="fu">ncell</span>(abd_breeding_la),</span>
 <span id="cb23-15"><a href="site.html#cb23-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb23-16"><a href="site.html#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(la), <span class="at">add =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="naoc2020-ebirdst_files/figure-html/local-quarters-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p><img src="ebirdst-workshop_files/figure-html/local-quarters-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
 <div id="site-local-uncertainty" class="section level3" number="2.5.1">
 <h3><span class="header-section-number">2.5.1</span> Uncertainty analysis</h3>
 <p>When using these abundance rasters at a local scale, it’s important to be cautious because of the broad spatial scale at which the modeling was conducted. As with any modeled estimates, these abundance estimates have uncertainty associated with them. One approach to dealing with this is to use the spatial estimates of uncertainty (the 10th and 90th quantiles of relative abundance) to assess if locations that we’re considering for selection have overlapping confidence intervals.</p>
@@ -330,7 +332,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb26-5"><a href="site.html#cb26-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">maxpixels =</span> <span class="fu">ncell</span>(abd_breeding_la),</span>
 <span id="cb26-6"><a href="site.html#cb26-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb26-7"><a href="site.html#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pts, <span class="at">pch =</span> <span class="dv">21</span>, <span class="at">bg =</span> <span class="st">&quot;red&quot;</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">cex =</span> <span class="dv">1</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="naoc2020-ebirdst_files/figure-html/local-uncertainty-map-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p><img src="ebirdst-workshop_files/figure-html/local-uncertainty-map-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
 <p>Let’s look at the abundance and confidence intervals for each of these points.</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="site.html#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extract raster values</span></span>
 <span id="cb27-2"><a href="site.html#cb27-2" aria-hidden="true" tabindex="-1"></a>pts<span class="sc">$</span>abd <span class="ot">&lt;-</span> <span class="fu">extract</span>(abd_breeding_la, pts)</span>
@@ -343,7 +345,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb27-9"><a href="site.html#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper)) <span class="sc">+</span></span>
 <span id="cb27-10"><a href="site.html#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Location&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Relative Abundance&quot;</span>,</span>
 <span id="cb27-11"><a href="site.html#cb27-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Confidence intervals for locations&quot;</span>)</span></code></pre></div>
-<p><img src="naoc2020-ebirdst_files/figure-html/local-uncertainty-plot-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p><img src="ebirdst-workshop_files/figure-html/local-uncertainty-plot-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
 <p>So, despite the “High” and “Middle” sites belonging to different quartiles of relative abundance, the uncertainty analysis suggests that we don’t have good evidence to pick one site over the other. In contrast, the “Low” site is signficantly lower in relative abundance than the other two sites.</p>
 </div>
 <div id="site-local-ground" class="section level3" number="2.5.2">

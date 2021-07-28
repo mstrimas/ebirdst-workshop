@@ -1,4 +1,4 @@
-book_filename: "naoc2020-ebirdst"
+book_filename: "ebirdst-workshop"
 delete_merged_file: true
 output_dir: "docs"
 before_chapter_script: "_common.r"

@@ -1,6 +1,6 @@
 --- 
 title: "eBird Status Data Products Workshop"
-author: "Matthew Strimas-Mackey and Tom Auer"
+author: "Matt Strimas-Mackey and Tom Auer"
 site: bookdown::bookdown_site
 documentclass: book
 description: "Lessons for a workshop on accessing and using the eBird Status Data Products"

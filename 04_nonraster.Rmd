@@ -8,19 +8,18 @@ editor_options:
 
 ## Objective {#nonraster-objective}
 
-To use the non-raster, centroid data as a diagnostic tool to assess predictive performance and identify the most important habitat predictors.
+To use the non-raster data to examine habitat associations and as a diagnostic tool to assess predictive performance.
 
 ## Introduction {#nonraster-intro}
 
-If we use `ebirdst_download(tifs_only = FALSE)`, the Status and Trends data packages that get downloaded will contain some addition data beyond the raster data we've already been working with. These data are provided at the level of the individual stixels that make up the ensemble which produces the abundance estimates. We often refer to these as "centroid" data because the centroids of the stixels are used to identify which stixel the values come from.
+If we use `ebirdst_download(tifs_only = FALSE)`, the data packages that get downloaded will contain two additional SQLite database that provide: 
+
+- Information about the modeled relationships between estimated occurrence and the ecological covariates used in the model in the form of predictor importance (PI) estimates and partial dependence (PD) relationships
+- Information about the statistical performance of the models, which can be use to estimate a suite of predictive performance metrics (PPMs)
+
+These data are provided at the level of the individual stixels that make up the ensemble that produces the abundance estimates. Stixels are identified by their centroid in space and time, which allows for calculation of PIs, PDs, and PPMs within a specific region and season by summarizing across just those stixels whose centroids that fall within the given region and season.
 
 `r knitr::include_graphics("img/single_stixel_with_dots.png")`
-
-These data have a variety of uses, but we'll focus on three here:
-
-1.  Identifying the effective region from which information is going into the analysis
-2.  Using predictive performance metrics as a diagnostic tool to assess model performance in a given region
-3.  Identifying the most important habitat predictors in a given region
 
 We'll start by loading packages and defining a focal region and time period: Louisiana during the breeding season.
 
@@ -40,7 +39,7 @@ logshr_run <- filter(ebirdst_runs, common_name == "Loggerhead Shrike")
 start_dt <- logshr_run$breeding_start
 end_dt <- logshr_run$breeding_end
 # ebirdst_extent object
-la_breeding_season <- ebirdst_extent(la, c(start_dt, end_dt))
+la_breeding <- ebirdst_extent(la, c(start_dt, end_dt))
 
 # loggerhead shrike data path
 sp_path <- get_species_path("logshr")
@@ -48,30 +47,73 @@ sp_path <- get_species_path("logshr")
 
 ## Effective extent {#nonraster-effext}
 
-For a given region and time period, `stixel_footprint()` produces a raster showing the spatial footprint of all the stixels whose centroids of fall within the given region and hence contribute to the model estimates there. To visualize this footprint, use `plot().
+For a given region and time period, `stixel_footprint()` produces a raster showing the spatial footprint of all the stixels whose centroids of fall within the given region and hence contribute to the model estimates there. To visualize this footprint, use `plot()`.
 
 ```{r nonraster-effext}
-footprint <- stixel_footprint(sp_path, la_breeding_season)
+footprint <- stixel_footprint(sp_path, la_breeding)
 plot(footprint)
 ```
 
 ## Predictive performance metrics {#nonraster-ppms}
 
-We can use `ebirdst_ppms()` to calculate model predictive performance metrics (PPMs) within a given region and season, here Louisiana during the breeding season, then call `plot()` to visualize these PPMs
+We can use `ebirdst_ppms()` to calculate predictive performance metrics (PPMs) within a given region and season, here Louisiana during the breeding season, then call `plot()` to visualize these PPMs
 
 ```{r nonraster-ppms}
-ppms <- ebirdst_ppms(sp_path, la_breeding_season)
+ppms <- ebirdst_ppms(sp_path, la_breeding)
 plot(ppms)
 ```
 
 ## Predictor importance {#nonraster-pi}
 
-Finally, we can look at the most importance predictor variables identified by the model in a given region and season.
+The stixel-level data can also be used to identify the most importance predictor variables in the model for a given region and season.
 
 ```{r nonraster-pi}
 # load predictor importance data
 pis <- load_pis(sp_path)
 
 # plot the predictor importances for louisiana in the breeding season
-plot_pis(pis, ext = la_breeding_season, by_cover_class = TRUE, n_top_pred = 25)
+plot_pis(pis, ext = la_breeding, by_cover_class = TRUE, n_top_pred = 25)
+```
+
+## Partial dependance {#nonraster-pd}
+
+We can also produce partial dependence plots that show the relationship between a given model covariate and the occurrence probability. Let's start by loading the PD data within the given region and season.
+
+```{r nonraster-pd-load}
+pds <- load_pds(sp_path, ext = la_breeding)
+```
+
+Smoothed partial dependence curves for a given predictor can be plotted using `plot_pds()`. Confidence intervals are estimated through a processing of subsampling and bootstrapping. This function returns the smoothed data and CIs and plots these data. For example, let's look at the impact of checklist start time (expressed as the difference in hours from solar noon) on the probability of observing a species.
+
+```{r nonraster-pd-start}
+# in the interest of speed, run with 5 bootstrap iterations
+# in practice, best to run with the default number of iterations (100)
+pd_smooth <- plot_pds(pds, "solar_noon_diff", ext = la_breeding, n_bs = 5)
+```
+
+As you'd expect, early morning is the best time to observe Loggerhead shrike. We also have access to the data behind this smoothed PD curve.
+
+```{r nonraster-pd-data}
+dplyr::glimpse(pd_smooth)
+```
+
+In addition to the effort covariates, we can also look at the relationships for the ecological covariates. For example, we saw from the PI plot that "dense herbaceous" is an important covariate, so let's example the PD curve for that variable. We can find it, and all other model covariates, listed in the `ebirdst_predictors` data frame.
+
+```{r nonraster-pd-elev}
+ebirdst_predictors %>% 
+  filter(lc_class_label == "Dense Herbaceous") %>% 
+  select(predictor_tidy, predictor_label)
+pd_smooth <- plot_pds(pds, "mcd12q1_lccs1_fs_c31_1500_pland", ext = la_breeding, 
+                      n_bs = 5)
+```
+
+So, Loggerhead Shrike has a strong positive association with dense herbaceous cover during the breeding season in Louisiana.
+
+## Habitat association {#nonraster-habitat}
+
+Finally, the PI and PD information can be combined to produce habitat charts similar to those available on the [eBird Status and Trends website](https://ebird.org/science/status-and-trends/habitat-regional-charts). The charts visualize how species associate with different habitat types throughout the year, giving both the strength and direction of that association.
+
+```{r nonraster-habitat}
+habitat <- ebirdst_habitat(sp_path, ext = la_breeding)
+plot(habitat)
 ```

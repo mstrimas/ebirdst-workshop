@@ -21,7 +21,7 @@
   <meta name="twitter:description" content="Lessons for a workshop on accessing and using the eBird Status Data Products" />
   
 
-<meta name="author" content="Matthew Strimas-Mackey and Tom Auer" />
+<meta name="author" content="Matt Strimas-Mackey and Tom Auer" />
 
 
 
@@ -178,6 +178,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.3" data-path="nonraster.html"><a href="nonraster.html#nonraster-effext"><i class="fa fa-check"></i><b>4.3</b> Effective extent</a></li>
 <li class="chapter" data-level="4.4" data-path="nonraster.html"><a href="nonraster.html#nonraster-ppms"><i class="fa fa-check"></i><b>4.4</b> Predictive performance metrics</a></li>
 <li class="chapter" data-level="4.5" data-path="nonraster.html"><a href="nonraster.html#nonraster-pi"><i class="fa fa-check"></i><b>4.5</b> Predictor importance</a></li>
+<li class="chapter" data-level="4.6" data-path="nonraster.html"><a href="nonraster.html#nonraster-pd"><i class="fa fa-check"></i><b>4.6</b> Partial dependance</a></li>
+<li class="chapter" data-level="4.7" data-path="nonraster.html"><a href="nonraster.html#nonraster-habitat"><i class="fa fa-check"></i><b>4.7</b> Habitat association</a></li>
 </ul></li>
 </ul>
 
@@ -200,18 +202,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">Lesson 4</span> Non-raster Data</h1>
 <div id="nonraster-objective" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> Objective</h2>
-<p>To use the non-raster, centroid data as a diagnostic tool to assess predictive performance and identify the most important habitat predictors.</p>
+<p>To use the non-raster data to examine habitat associations and as a diagnostic tool to assess predictive performance.</p>
 </div>
 <div id="nonraster-intro" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Introduction</h2>
-<p>If we use <code>ebirdst_download(tifs_only = FALSE)</code>, the Status and Trends data packages that get downloaded will contain some addition data beyond the raster data we’ve already been working with. These data are provided at the level of the individual stixels that make up the ensemble which produces the abundance estimates. We often refer to these as “centroid” data because the centroids of the stixels are used to identify which stixel the values come from.</p>
+<p>If we use <code>ebirdst_download(tifs_only = FALSE)</code>, the data packages that get downloaded will contain two additional SQLite database that provide:</p>
+<ul>
+<li>Information about the modeled relationships between estimated occurrence and the ecological covariates used in the model in the form of predictor importance (PI) estimates and partial dependence (PD) relationships</li>
+<li>Information about the statistical performance of the models, which can be use to estimate a suite of predictive performance metrics (PPMs)</li>
+</ul>
+<p>These data are provided at the level of the individual stixels that make up the ensemble that produces the abundance estimates. Stixels are identified by their centroid in space and time, which allows for calculation of PIs, PDs, and PPMs within a specific region and season by summarizing across just those stixels whose centroids that fall within the given region and season.</p>
 <p><img src="img/single_stixel_with_dots.png" width="\textwidth" style="display: block; margin: auto;" /></p>
-<p>These data have a variety of uses, but we’ll focus on three here:</p>
-<ol style="list-style-type: decimal">
-<li>Identifying the effective region from which information is going into the analysis</li>
-<li>Using predictive performance metrics as a diagnostic tool to assess model performance in a given region</li>
-<li>Identifying the most important habitat predictors in a given region</li>
-</ol>
 <p>We’ll start by loading packages and defining a focal region and time period: Louisiana during the breeding season.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="nonraster.html#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ebirdst)</span>
 <span id="cb34-2"><a href="nonraster.html#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
@@ -228,34 +229,72 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb34-13"><a href="nonraster.html#cb34-13" aria-hidden="true" tabindex="-1"></a>start_dt <span class="ot">&lt;-</span> logshr_run<span class="sc">$</span>breeding_start</span>
 <span id="cb34-14"><a href="nonraster.html#cb34-14" aria-hidden="true" tabindex="-1"></a>end_dt <span class="ot">&lt;-</span> logshr_run<span class="sc">$</span>breeding_end</span>
 <span id="cb34-15"><a href="nonraster.html#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ebirdst_extent object</span></span>
-<span id="cb34-16"><a href="nonraster.html#cb34-16" aria-hidden="true" tabindex="-1"></a>la_breeding_season <span class="ot">&lt;-</span> <span class="fu">ebirdst_extent</span>(la, <span class="fu">c</span>(start_dt, end_dt))</span>
+<span id="cb34-16"><a href="nonraster.html#cb34-16" aria-hidden="true" tabindex="-1"></a>la_breeding <span class="ot">&lt;-</span> <span class="fu">ebirdst_extent</span>(la, <span class="fu">c</span>(start_dt, end_dt))</span>
 <span id="cb34-17"><a href="nonraster.html#cb34-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-18"><a href="nonraster.html#cb34-18" aria-hidden="true" tabindex="-1"></a><span class="co"># loggerhead shrike data path</span></span>
 <span id="cb34-19"><a href="nonraster.html#cb34-19" aria-hidden="true" tabindex="-1"></a>sp_path <span class="ot">&lt;-</span> <span class="fu">get_species_path</span>(<span class="st">&quot;logshr&quot;</span>)</span></code></pre></div>
 </div>
 <div id="nonraster-effext" class="section level2" number="4.3">
 <h2><span class="header-section-number">4.3</span> Effective extent</h2>
-<p>For a given region and time period, <code>stixel_footprint()</code> produces a raster showing the spatial footprint of all the stixels whose centroids of fall within the given region and hence contribute to the model estimates there. To visualize this footprint, use `plot().</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="nonraster.html#cb35-1" aria-hidden="true" tabindex="-1"></a>footprint <span class="ot">&lt;-</span> <span class="fu">stixel_footprint</span>(sp_path, la_breeding_season)</span>
+<p>For a given region and time period, <code>stixel_footprint()</code> produces a raster showing the spatial footprint of all the stixels whose centroids of fall within the given region and hence contribute to the model estimates there. To visualize this footprint, use <code>plot()</code>.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="nonraster.html#cb35-1" aria-hidden="true" tabindex="-1"></a>footprint <span class="ot">&lt;-</span> <span class="fu">stixel_footprint</span>(sp_path, la_breeding)</span>
 <span id="cb35-2"><a href="nonraster.html#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(footprint)</span></code></pre></div>
-<p><img src="naoc2020-ebirdst_files/figure-html/nonraster-effext-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p><img src="ebirdst-workshop_files/figure-html/nonraster-effext-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
 </div>
 <div id="nonraster-ppms" class="section level2" number="4.4">
 <h2><span class="header-section-number">4.4</span> Predictive performance metrics</h2>
-<p>We can use <code>ebirdst_ppms()</code> to calculate model predictive performance metrics (PPMs) within a given region and season, here Louisiana during the breeding season, then call <code>plot()</code> to visualize these PPMs</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="nonraster.html#cb36-1" aria-hidden="true" tabindex="-1"></a>ppms <span class="ot">&lt;-</span> <span class="fu">ebirdst_ppms</span>(sp_path, la_breeding_season)</span>
+<p>We can use <code>ebirdst_ppms()</code> to calculate predictive performance metrics (PPMs) within a given region and season, here Louisiana during the breeding season, then call <code>plot()</code> to visualize these PPMs</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="nonraster.html#cb36-1" aria-hidden="true" tabindex="-1"></a>ppms <span class="ot">&lt;-</span> <span class="fu">ebirdst_ppms</span>(sp_path, la_breeding)</span>
 <span id="cb36-2"><a href="nonraster.html#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ppms)</span></code></pre></div>
-<p><img src="naoc2020-ebirdst_files/figure-html/nonraster-ppms-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p><img src="ebirdst-workshop_files/figure-html/nonraster-ppms-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
 </div>
 <div id="nonraster-pi" class="section level2" number="4.5">
 <h2><span class="header-section-number">4.5</span> Predictor importance</h2>
-<p>Finally, we can look at the most importance predictor variables identified by the model in a given region and season.</p>
+<p>The stixel-level data can also be used to identify the most importance predictor variables in the model for a given region and season.</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="nonraster.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load predictor importance data</span></span>
 <span id="cb37-2"><a href="nonraster.html#cb37-2" aria-hidden="true" tabindex="-1"></a>pis <span class="ot">&lt;-</span> <span class="fu">load_pis</span>(sp_path)</span>
 <span id="cb37-3"><a href="nonraster.html#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-4"><a href="nonraster.html#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the predictor importances for louisiana in the breeding season</span></span>
-<span id="cb37-5"><a href="nonraster.html#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_pis</span>(pis, <span class="at">ext =</span> la_breeding_season, <span class="at">by_cover_class =</span> <span class="cn">TRUE</span>, <span class="at">n_top_pred =</span> <span class="dv">25</span>)</span></code></pre></div>
-<p><img src="naoc2020-ebirdst_files/figure-html/nonraster-pi-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<span id="cb37-5"><a href="nonraster.html#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_pis</span>(pis, <span class="at">ext =</span> la_breeding, <span class="at">by_cover_class =</span> <span class="cn">TRUE</span>, <span class="at">n_top_pred =</span> <span class="dv">25</span>)</span></code></pre></div>
+<p><img src="ebirdst-workshop_files/figure-html/nonraster-pi-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+</div>
+<div id="nonraster-pd" class="section level2" number="4.6">
+<h2><span class="header-section-number">4.6</span> Partial dependance</h2>
+<p>We can also produce partial dependence plots that show the relationship between a given model covariate and the occurrence probability. Let’s start by loading the PD data within the given region and season.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="nonraster.html#cb38-1" aria-hidden="true" tabindex="-1"></a>pds <span class="ot">&lt;-</span> <span class="fu">load_pds</span>(sp_path, <span class="at">ext =</span> la_breeding)</span></code></pre></div>
+<p>Smoothed partial dependence curves for a given predictor can be plotted using <code>plot_pds()</code>. Confidence intervals are estimated through a processing of subsampling and bootstrapping. This function returns the smoothed data and CIs and plots these data. For example, let’s look at the impact of checklist start time (expressed as the difference in hours from solar noon) on the probability of observing a species.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="nonraster.html#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># in the interest of speed, run with 5 bootstrap iterations</span></span>
+<span id="cb39-2"><a href="nonraster.html#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># in practice, best to run with the default number of iterations (100)</span></span>
+<span id="cb39-3"><a href="nonraster.html#cb39-3" aria-hidden="true" tabindex="-1"></a>pd_smooth <span class="ot">&lt;-</span> <span class="fu">plot_pds</span>(pds, <span class="st">&quot;solar_noon_diff&quot;</span>, <span class="at">ext =</span> la_breeding, <span class="at">n_bs =</span> <span class="dv">5</span>)</span></code></pre></div>
+<p><img src="ebirdst-workshop_files/figure-html/nonraster-pd-start-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p>As you’d expect, early morning is the best time to observe Loggerhead shrike. We also have access to the data behind this smoothed PD curve.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="nonraster.html#cb40-1" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">glimpse</span>(pd_smooth)</span>
+<span id="cb40-2"><a href="nonraster.html#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Rows: 25</span></span>
+<span id="cb40-3"><a href="nonraster.html#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Columns: 4</span></span>
+<span id="cb40-4"><a href="nonraster.html#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ x         &lt;dbl&gt; -11.9272, -10.9303, -9.9335, -8.9366, -7.9397, -6.9428, -5.9460, -4.9491, -3.9522, -2.9553, -1…</span></span>
+<span id="cb40-5"><a href="nonraster.html#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ pd_median &lt;dbl&gt; 8.42e-03, 8.35e-03, 7.33e-03, 8.24e-03, 8.56e-03, 8.93e-03, 7.45e-03, 5.14e-03, 2.88e-03, 9.07…</span></span>
+<span id="cb40-6"><a href="nonraster.html#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ pd_lower  &lt;dbl&gt; 0.004907, 0.005326, 0.006127, 0.006603, 0.007228, 0.007768, 0.007055, 0.004898, 0.002337, -0.0…</span></span>
+<span id="cb40-7"><a href="nonraster.html#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ pd_upper  &lt;dbl&gt; 0.010101, 0.009306, 0.008928, 0.008586, 0.009114, 0.009606, 0.008104, 0.005532, 0.002993, 0.00…</span></span></code></pre></div>
+<p>In addition to the effort covariates, we can also look at the relationships for the ecological covariates. For example, we saw from the PI plot that “dense herbaceous” is an important covariate, so let’s example the PD curve for that variable. We can find it, and all other model covariates, listed in the <code>ebirdst_predictors</code> data frame.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="nonraster.html#cb41-1" aria-hidden="true" tabindex="-1"></a>ebirdst_predictors <span class="sc">%&gt;%</span> </span>
+<span id="cb41-2"><a href="nonraster.html#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(lc_class_label <span class="sc">==</span> <span class="st">&quot;Dense Herbaceous&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-3"><a href="nonraster.html#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(predictor_tidy, predictor_label)</span>
+<span id="cb41-4"><a href="nonraster.html#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2 x 2</span></span>
+<span id="cb41-5"><a href="nonraster.html#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   predictor_tidy                  predictor_label       </span></span>
+<span id="cb41-6"><a href="nonraster.html#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                           &lt;chr&gt;                 </span></span>
+<span id="cb41-7"><a href="nonraster.html#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 mcd12q1_lccs1_fs_c31_1500_ed    Dense Herbaceous ED   </span></span>
+<span id="cb41-8"><a href="nonraster.html#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 mcd12q1_lccs1_fs_c31_1500_pland Dense Herbaceous PLAND</span></span>
+<span id="cb41-9"><a href="nonraster.html#cb41-9" aria-hidden="true" tabindex="-1"></a>pd_smooth <span class="ot">&lt;-</span> <span class="fu">plot_pds</span>(pds, <span class="st">&quot;mcd12q1_lccs1_fs_c31_1500_pland&quot;</span>, <span class="at">ext =</span> la_breeding, </span>
+<span id="cb41-10"><a href="nonraster.html#cb41-10" aria-hidden="true" tabindex="-1"></a>                      <span class="at">n_bs =</span> <span class="dv">5</span>)</span></code></pre></div>
+<p><img src="ebirdst-workshop_files/figure-html/nonraster-pd-elev-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
+<p>So, Loggerhead Shrike has a strong positive association with dense herbaceous cover during the breeding season in Louisiana.</p>
+</div>
+<div id="nonraster-habitat" class="section level2" number="4.7">
+<h2><span class="header-section-number">4.7</span> Habitat association</h2>
+<p>Finally, the PI and PD information can be combined to produce habitat charts similar to those available on the <a href="https://ebird.org/science/status-and-trends/habitat-regional-charts">eBird Status and Trends website</a>. The charts visualize how species associate with different habitat types throughout the year, giving both the strength and direction of that association.</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="nonraster.html#cb42-1" aria-hidden="true" tabindex="-1"></a>habitat <span class="ot">&lt;-</span> <span class="fu">ebirdst_habitat</span>(sp_path, <span class="at">ext =</span> la_breeding)</span>
+<span id="cb42-2"><a href="nonraster.html#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(habitat)</span></code></pre></div>
+<p><img src="ebirdst-workshop_files/figure-html/nonraster-habitat-1.png" width="\textwidth" style="display: block; margin: auto;" /></p>
 
 </div>
 </div>

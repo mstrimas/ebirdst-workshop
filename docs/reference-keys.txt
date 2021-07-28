@@ -28,3 +28,5 @@ nonraster-intro
 nonraster-effext
 nonraster-ppms
 nonraster-pi
+nonraster-pd
+nonraster-habitat
