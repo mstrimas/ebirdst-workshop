@@ -45,7 +45,8 @@ pct_pop <- abd / abd_total
 Finally, we can extract all the values that fall within the given polygon and sum them to calculate the percent of population within the polygon.
 
 ```{r  aos21-sumpop}
-state_pop <- exact_extract(pct_pop, states, fun = "sum", append_cols = "name")
+state_pop <- exact_extract(pct_pop, states, fun = "sum", append_cols = "name", 
+                           progress = FALSE)
 arrange(state_pop, -sum.breeding)
 ```
 
