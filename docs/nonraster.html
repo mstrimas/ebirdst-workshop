@@ -31,7 +31,7 @@
   
   
 <link rel="prev" href="trajectories.html"/>
-
+<link rel="next" href="aos21.html"/>
 <script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -181,6 +181,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.6" data-path="nonraster.html"><a href="nonraster.html#nonraster-pd"><i class="fa fa-check"></i><b>4.6</b> Partial dependance</a></li>
 <li class="chapter" data-level="4.7" data-path="nonraster.html"><a href="nonraster.html#nonraster-habitat"><i class="fa fa-check"></i><b>4.7</b> Habitat association</a></li>
 </ul></li>
+<li class="chapter" data-level="5" data-path="aos21.html"><a href="aos21.html"><i class="fa fa-check"></i><b>5</b> AOS 2021</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="aos21.html"><a href="aos21.html#aos21-objectives"><i class="fa fa-check"></i><b>5.1</b> Objective</a></li>
+<li class="chapter" data-level="5.2" data-path="aos21.html"><a href="aos21.html#aos21-pop"><i class="fa fa-check"></i><b>5.2</b> Percent of population</a></li>
+<li class="chapter" data-level="5.3" data-path="aos21.html"><a href="aos21.html#aos21-habitat"><i class="fa fa-check"></i><b>5.3</b> Habitat associations</a></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -271,15 +277,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="nonraster.html#cb40-1" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">glimpse</span>(pd_smooth)</span>
 <span id="cb40-2"><a href="nonraster.html#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Rows: 25</span></span>
 <span id="cb40-3"><a href="nonraster.html#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Columns: 4</span></span>
-<span id="cb40-4"><a href="nonraster.html#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ x         &lt;dbl&gt; -11.9272, -10.9303, -9.9335, -8.9366, -7.9397, -6.9428, -5.9460, -4.9491, -3.9522, -2.9553, -1…</span></span>
-<span id="cb40-5"><a href="nonraster.html#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ pd_median &lt;dbl&gt; 8.42e-03, 8.35e-03, 7.33e-03, 8.24e-03, 8.56e-03, 8.93e-03, 7.45e-03, 5.14e-03, 2.88e-03, 9.07…</span></span>
-<span id="cb40-6"><a href="nonraster.html#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ pd_lower  &lt;dbl&gt; 0.004907, 0.005326, 0.006127, 0.006603, 0.007228, 0.007768, 0.007055, 0.004898, 0.002337, -0.0…</span></span>
-<span id="cb40-7"><a href="nonraster.html#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ pd_upper  &lt;dbl&gt; 0.010101, 0.009306, 0.008928, 0.008586, 0.009114, 0.009606, 0.008104, 0.005532, 0.002993, 0.00…</span></span></code></pre></div>
+<span id="cb40-4"><a href="nonraster.html#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ x         &lt;dbl&gt; -11.9272, -10.9303, -9.9335, -8.9366, -7.9397, -6.9428, -5.9460, -4.9491, -3.9522, -2.9553, -1.…</span></span>
+<span id="cb40-5"><a href="nonraster.html#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ pd_median &lt;dbl&gt; 8.42e-03, 8.35e-03, 7.33e-03, 8.24e-03, 8.56e-03, 8.93e-03, 7.45e-03, 5.14e-03, 2.88e-03, 9.07e…</span></span>
+<span id="cb40-6"><a href="nonraster.html#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ pd_lower  &lt;dbl&gt; 0.004907, 0.005326, 0.006127, 0.006603, 0.007228, 0.007768, 0.007055, 0.004898, 0.002337, -0.00…</span></span>
+<span id="cb40-7"><a href="nonraster.html#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ pd_upper  &lt;dbl&gt; 0.010101, 0.009306, 0.008928, 0.008586, 0.009114, 0.009606, 0.008104, 0.005532, 0.002993, 0.000…</span></span></code></pre></div>
 <p>In addition to the effort covariates, we can also look at the relationships for the ecological covariates. For example, we saw from the PI plot that “dense herbaceous” is an important covariate, so let’s example the PD curve for that variable. We can find it, and all other model covariates, listed in the <code>ebirdst_predictors</code> data frame.</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="nonraster.html#cb41-1" aria-hidden="true" tabindex="-1"></a>ebirdst_predictors <span class="sc">%&gt;%</span> </span>
 <span id="cb41-2"><a href="nonraster.html#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(lc_class_label <span class="sc">==</span> <span class="st">&quot;Dense Herbaceous&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb41-3"><a href="nonraster.html#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(predictor_tidy, predictor_label)</span>
-<span id="cb41-4"><a href="nonraster.html#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2 x 2</span></span>
+<span id="cb41-4"><a href="nonraster.html#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2 × 2</span></span>
 <span id="cb41-5"><a href="nonraster.html#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   predictor_tidy                  predictor_label       </span></span>
 <span id="cb41-6"><a href="nonraster.html#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                           &lt;chr&gt;                 </span></span>
 <span id="cb41-7"><a href="nonraster.html#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 mcd12q1_lccs1_fs_c31_1500_ed    Dense Herbaceous ED   </span></span>
@@ -303,8 +309,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="trajectories.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="trajectories.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="aos21.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

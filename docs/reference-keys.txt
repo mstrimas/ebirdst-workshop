@@ -30,3 +30,7 @@ nonraster-ppms
 nonraster-pi
 nonraster-pd
 nonraster-habitat
+aos21
+aos21-objectives
+aos21-pop
+aos21-habitat

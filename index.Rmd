@@ -17,7 +17,8 @@ This workshop will introduce attendees to the eBird Status Data Products (weekly
 To run the code in the workshop you'll need to install the following packages:
 
 ```{r eval = FALSE}
-install.packages(c("tidyverse", "raster", "sf", "rnaturalearth", "rgeos", "remotes"))
+install.packages(c("tidyverse", "raster", "sf", "rnaturalearth", "rgeos", 
+                   "remotes", "exactextractr"))
 remotes::install_github("ropensci/rnaturalearthhires")
 ```
 

@@ -1,0 +1,103 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# AOS 2021 {#aos21}
+
+## Objective {#aos21-objectives}
+
+Covering examples specifically requested at the AOS 2021 workshop.
+
+```{r trajectories-aos21}
+library(ebirdst)
+library(raster)
+library(sf)
+library(rnaturalearth)
+library(tidyverse)
+library(exactextractr)
+```
+
+## Percent of population {#aos21-pop}
+
+The [abundance regional stats section](https://ebird.org/science/status-and-trends/logshr/abundance-stats-regional) of the status and trends website provides estimates of the percent of the population within each state or Bird Conservation Region (BCR). Users of the data may want to calculate this percent of population for custom regions, not found on the status and trends website. As an example, let's calculate the percent of population found in US states during each season.
+
+Let's start by downloading state boundaries from Natural Earth and loading the seasonal relative abundance. Here we'll use the `lr` data in the interest of speed.
+
+```{r aos21-data}
+# loggerhead shrike seasonal abundance
+abd <- get_species_path("logshr") %>% 
+  load_raster("abundance_seasonal", res = "lr")
+
+# border of louisiana
+states <- ne_states(iso_a2 = "US", returnclass = "sf") %>% 
+  st_transform(crs = projection(abd))
+```
+
+Next we'll convert the relative abundance raster into a percent of population raster by dividing by the total population across the whole range.
+
+```{r aos21-calcpop}
+abd_total <- cellStats(abd, sum)
+pct_pop <- abd / abd_total
+```
+
+Finally, we can extract all the values that fall within the given polygon and sum them to calculate the percent of population within the polygon.
+
+```{r  aos21-sumpop}
+state_pop <- exact_extract(pct_pop, states, fun = "sum", append_cols = "name")
+arrange(state_pop, -sum.breeding)
+```
+
+## Habitat associations {#aos21-habitat}
+
+As covered in [lesson 4 on non-raster data](#nonraster), the data packages contain two types of information about the the modeled relationships between estimated occurrence and the habitat covariates used in the model. Predictor importance (PI) estimates identify the most importance predictor variables in the model. Partial dependences (PD) show the relationship between a given habitat covariate and the occurrence probability. 
+
+Let's start by defining a region and season: Loggerhead Shrike within Louisiana during the breeding season.
+
+```{r aos21-rss}
+# loggerhead shrike data path
+sp_path <- get_species_path("logshr")
+
+# border of louisiana
+la <- ne_states(iso_a2 = "US", returnclass = "sf") %>% 
+  filter(name == "Louisiana")
+# breeding season
+logshr_run <- filter(ebirdst_runs, common_name == "Loggerhead Shrike")
+start_dt <- logshr_run$breeding_start
+end_dt <- logshr_run$breeding_end
+# ebirdst_extent object
+la_breeding <- ebirdst_extent(la, c(start_dt, end_dt))
+```
+
+Now we can look at the most important predictors:
+
+```{r aos21-pis}
+pis <- load_pis(sp_path, ext = la_breeding)
+plot_pis(pis, ext = la_breeding, by_cover_class = TRUE, n_top_pred = 25)
+```
+
+From this PI plot we can see that "dense herbaceous" is an important covariate, so let's example the PD curve for that habitat type. We can find it, and all other model covariates, listed in the `ebirdst_predictors` data frame.
+
+```{r aos21-pds}
+pds <- load_pds(sp_path, ext = la_breeding)
+ebirdst_predictors %>% 
+  filter(lc_class_label == "Dense Herbaceous") %>% 
+  select(predictor_tidy, predictor_label)
+pd_smooth <- plot_pds(pds, "mcd12q1_lccs1_fs_c31_1500_pland", ext = la_breeding, 
+                      n_bs = 5)
+```
+
+We can think of the PIs and PDs telling us something about the strength and directionality of a habitat association, respectively. For example, there is a strong positive association with dense herbaceous cover. The [regional habitat charts on the eBird Status and Trends](https://ebird.org/science/status-and-trends/habitat-regional-charts) website combine the PI and PD information to visualize how species associate with different habitat types throughout the year, giving both the strength and direction of that association. The function `ebirdst_habitat()` generates the data behind these plots for a given region.
+
+```{r aos21-habitat}
+habitat <- ebirdst_habitat(sp_path, ext = la_breeding)
+habitat
+```
+
+We can call `plot()` on the output of `ebirdst_habitat()` to generate a habitat association chart.
+
+```{r aos21-habchart}
+plot(habitat)
+```
+
